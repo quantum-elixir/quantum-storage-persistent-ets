@@ -60,6 +60,8 @@ defmodule QuantumStorageEts.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:persistent_ets, "~> 0.1.0"},
+      {:quantum, github: "c-rack/quantum-elixir", branch: "storage"},
       {:earmark, "~> 1.0", only: [:dev, :docs], runtime: false},
       {:ex_doc, "~> 0.13", only: [:dev, :docs], runtime: false},
       {:excoveralls, "~> 0.5", only: [:dev, :test], runtime: false},
