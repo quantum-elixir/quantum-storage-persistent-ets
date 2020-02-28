@@ -1,53 +1,89 @@
 defmodule QuantumStorageEts do
   @moduledoc """
-  persistent_ets based implementation of a `Quantum.Storage.Adapter`.
-  See https://hexdocs.pm/persistent_ets
+  `PersistentEts` based implementation of a `Quantum.Storage`.
   """
-  require Logger
+
   use GenServer
-  defstruct [:schedulers]
 
-  def start_link do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
-  end
+  require Logger
 
-  # Callbacks
+  alias __MODULE__.State
 
-  defp __server__, do: __MODULE__
+  @server __MODULE__
 
-  def init(_) do
-    {:ok, %__MODULE__{schedulers: %{}}}
-  end
+  @behaviour Quantum.Storage
 
+  def start_link(opts),
+    do: GenServer.start_link(__MODULE__, opts, name: Keyword.get(opts, :name, @server))
+
+  @impl GenServer
+  def init(opts), do: {:ok, %State{schedulers: %{}, name: Keyword.get(opts, :name, @server)}}
+
+  @impl Quantum.Storage
+  def jobs(server \\ @server, scheduler_module),
+    do: GenServer.call(server, {:jobs, scheduler_module})
+
+  @impl Quantum.Storage
+  def add_job(server \\ @server, scheduler_module, job),
+    do: GenServer.call(server, {:add_job, scheduler_module, job})
+
+  @impl Quantum.Storage
+  def delete_job(server \\ @server, scheduler_module, job_name),
+    do: GenServer.call(server, {:delete_job, scheduler_module, job_name})
+
+  @impl Quantum.Storage
+  def update_job_state(server \\ @server, scheduler_module, job_name, state),
+    do: GenServer.call(server, {:update_job_state, scheduler_module, job_name, state})
+
+  @impl Quantum.Storage
+  def last_execution_date(server \\ @server, scheduler_module),
+    do: GenServer.call(server, {:last_execution_date, scheduler_module})
+
+  @impl Quantum.Storage
+  def update_last_execution_date(server \\ @server, scheduler_module, last_execution_date),
+    do:
+      GenServer.call(server, {:update_last_execution_date, scheduler_module, last_execution_date})
+
+  @impl Quantum.Storage
+  def purge(server \\ @server, scheduler_module),
+    do: GenServer.call(server, {:purge, scheduler_module})
+
+  def purge_all(server \\ @server), do: GenServer.call(server, :purge_all)
+
+  @impl GenServer
   def handle_call(
         {:add_job, scheduler_module, job},
         _from,
-        %__MODULE__{schedulers: schedulers} = state
+        %State{schedulers: schedulers, name: name} = state
       ) do
     {
       :reply,
-      do_add_job(scheduler_module, job),
+      do_add_job(name, scheduler_module, job),
       %{
         state
         | schedulers:
             schedulers
             |> Map.put_new_lazy(scheduler_module, fn ->
-              create_scheduler_module_atom(scheduler_module)
+              create_scheduler_module_atom(name, scheduler_module)
             end)
       }
     }
   end
 
-  def handle_call({:jobs, scheduler_module}, _from, %__MODULE__{schedulers: schedulers} = state) do
+  def handle_call(
+        {:jobs, scheduler_module},
+        _from,
+        %State{schedulers: schedulers, name: name} = state
+      ) do
     {
       :reply,
-      do_get_jobs(scheduler_module),
+      do_get_jobs(name, scheduler_module),
       %{
         state
         | schedulers:
             schedulers
             |> Map.put_new_lazy(scheduler_module, fn ->
-              create_scheduler_module_atom(scheduler_module)
+              create_scheduler_module_atom(name, scheduler_module)
             end)
       }
     }
@@ -56,17 +92,17 @@ defmodule QuantumStorageEts do
   def handle_call(
         {:delete_job, scheduler_module, job},
         _from,
-        %__MODULE__{schedulers: schedulers} = state
+        %State{schedulers: schedulers, name: name} = state
       ) do
     {
       :reply,
-      do_delete_job(scheduler_module, job),
+      do_delete_job(name, scheduler_module, job),
       %{
         state
         | schedulers:
             schedulers
             |> Map.put_new_lazy(scheduler_module, fn ->
-              create_scheduler_module_atom(scheduler_module)
+              create_scheduler_module_atom(name, scheduler_module)
             end)
       }
     }
@@ -75,17 +111,17 @@ defmodule QuantumStorageEts do
   def handle_call(
         {:update_job_state, scheduler_module, job_name, job_state},
         _from,
-        %__MODULE__{schedulers: schedulers} = state
+        %State{schedulers: schedulers, name: name} = state
       ) do
     {
       :reply,
-      do_update_job_state(scheduler_module, job_name, job_state),
+      do_update_job_state(name, scheduler_module, job_name, job_state),
       %{
         state
         | schedulers:
             schedulers
             |> Map.put_new_lazy(scheduler_module, fn ->
-              create_scheduler_module_atom(scheduler_module)
+              create_scheduler_module_atom(name, scheduler_module)
             end)
       }
     }
@@ -94,17 +130,17 @@ defmodule QuantumStorageEts do
   def handle_call(
         {:last_execution_date, scheduler_module},
         _from,
-        %__MODULE__{schedulers: schedulers} = state
+        %State{schedulers: schedulers, name: name} = state
       ) do
     {
       :reply,
-      do_get_last_execution_date(scheduler_module),
+      do_get_last_execution_date(name, scheduler_module),
       %{
         state
         | schedulers:
             schedulers
             |> Map.put_new_lazy(scheduler_module, fn ->
-              create_scheduler_module_atom(scheduler_module)
+              create_scheduler_module_atom(name, scheduler_module)
             end)
       }
     }
@@ -113,17 +149,17 @@ defmodule QuantumStorageEts do
   def handle_call(
         {:update_last_execution_date, scheduler_module, last_execution_date},
         _from,
-        %__MODULE__{schedulers: schedulers} = state
+        %State{schedulers: schedulers, name: name} = state
       ) do
     {
       :reply,
-      do_update_last_execution_date(scheduler_module, last_execution_date),
+      do_update_last_execution_date(name, scheduler_module, last_execution_date),
       %{
         state
         | schedulers:
             schedulers
             |> Map.put_new_lazy(scheduler_module, fn ->
-              create_scheduler_module_atom(scheduler_module)
+              create_scheduler_module_atom(name, scheduler_module)
             end)
       }
     }
@@ -132,40 +168,48 @@ defmodule QuantumStorageEts do
   def handle_call(
         {:purge, scheduler_module},
         _from,
-        %__MODULE__{schedulers: schedulers} = state
+        %State{schedulers: schedulers, name: name} = state
       ) do
     {
       :reply,
-      do_purge(scheduler_module),
+      do_purge(name, scheduler_module),
       %{
         state
         | schedulers:
             schedulers
             |> Map.put_new_lazy(scheduler_module, fn ->
-              create_scheduler_module_atom(scheduler_module)
+              create_scheduler_module_atom(name, scheduler_module)
             end)
       }
     }
   end
 
-  # Helpers
-  defp create_scheduler_module_atom(scheduler_module) do
-    scheduler_module
+  def handle_call(:purge_all, _from, %State{schedulers: schedulers, name: name} = state) do
+    schedulers |> Map.values() |> Enum.each(fn scheduler -> :ok = do_purge(name, scheduler) end)
+    {:reply, :ok, state}
+  end
+
+  defp create_scheduler_module_atom(storage_name, scheduler_module) do
+    Module.concat(storage_name, scheduler_module)
   end
 
   defp job_key(job_name) do
     {:job, job_name}
   end
 
-  defp get_ets_by_scheduler(scheduler_module) do
-    scheduler_module_atom = create_scheduler_module_atom(scheduler_module)
+  defp get_ets_by_scheduler(storage_name, scheduler_module) do
+    scheduler_module_atom = create_scheduler_module_atom(storage_name, scheduler_module)
 
     if ets_exist?(scheduler_module_atom) do
       scheduler_module_atom
     else
-      PersistentEts.new(scheduler_module_atom, "#{scheduler_module_atom}.tab", [
+      path = Application.app_dir(:quantum_storage_ets, "priv/tables/#{scheduler_module_atom}.tab")
+
+      File.mkdir_p!(Path.dirname(path))
+
+      PersistentEts.new(scheduler_module_atom, path, [
         :named_table,
-        :set
+        :ordered_set
       ])
     end
   end
@@ -192,9 +236,8 @@ defmodule QuantumStorageEts do
     result
   end
 
-  # Private functions
-  defp do_add_job(scheduler_module, job) do
-    table = get_ets_by_scheduler(scheduler_module)
+  defp do_add_job(storage_name, scheduler_module, job) do
+    table = get_ets_by_scheduler(storage_name, scheduler_module)
     :ets.insert(table, entry = {job_key(job.name), job})
 
     Logger.debug(fn ->
@@ -206,48 +249,41 @@ defmodule QuantumStorageEts do
     :ok
   end
 
-  defp do_get_jobs(scheduler_module) do
-    table = get_ets_by_scheduler(scheduler_module)
-
-    result =
-      case :ets.match(table, {{:job, :_}, :"$1"}) do
-        [] -> :not_applicable
-        [_h | _t] = jobs -> jobs |> List.flatten()
-      end
-
-    Logger.debug(fn ->
-      "[#{inspect(Node.self())}][#{__MODULE__}] jobs are: #{inspect(result)}"
-    end)
-
-    result
+  defp do_get_jobs(storage_name, scheduler_module) do
+    storage_name
+    |> create_scheduler_module_atom(scheduler_module)
+    |> ets_exist?()
+    |> if do
+      storage_name
+      |> get_ets_by_scheduler(scheduler_module)
+      |> :ets.match({{:job, :_}, :"$1"})
+      |> List.flatten()
+    else
+      :not_applicable
+    end
   end
 
-  defp do_delete_job(scheduler_module, job_name) do
-    table = get_ets_by_scheduler(scheduler_module)
-    :ets.delete(table, job_key(job_name))
+  defp do_delete_job(storage_name, scheduler_module, job_name) do
+    storage_name
+    |> get_ets_by_scheduler(scheduler_module)
+    |> :ets.delete(job_key(job_name))
+
     :ok
   end
 
-  defp do_update_job_state(scheduler_module, job_name, state) do
-    table = get_ets_by_scheduler(scheduler_module)
+  defp do_update_job_state(storage_name, scheduler_module, job_name, state) do
+    table = get_ets_by_scheduler(storage_name, scheduler_module)
 
-    job =
-      case :ets.lookup(table, {:job, job_name}) do
-        # TODO: should we raise here or should we handle the situation with a return value of a special kind?
-        [] ->
-          raise "Job #{job_name} does not exist in the storage"
+    table
+    |> :ets.lookup(job_key(job_name))
+    |> Enum.map(&{elem(&1, 0), %{elem(&1, 1) | state: state}})
+    |> Enum.each(&:ets.update_element(table, elem(&1, 0), {2, elem(&1, 1)}))
 
-        [j | _t] ->
-          j
-      end
-
-    upd_job = %{job | state: state}
-    :ets.update_element(table, job_key(job_name), {1, upd_job})
     :ok
   end
 
-  defp do_get_last_execution_date(scheduler_module) do
-    table = get_ets_by_scheduler(scheduler_module)
+  defp do_get_last_execution_date(storage_name, scheduler_module) do
+    table = get_ets_by_scheduler(storage_name, scheduler_module)
 
     case :ets.lookup(table, :last_execution_date) do
       [] -> :unknown
@@ -256,46 +292,15 @@ defmodule QuantumStorageEts do
     end
   end
 
-  defp do_update_last_execution_date(scheduler_module, last_execution_date) do
-    table = get_ets_by_scheduler(scheduler_module)
+  defp do_update_last_execution_date(storage_name, scheduler_module, last_execution_date) do
+    table = get_ets_by_scheduler(storage_name, scheduler_module)
     :ets.insert(table, {:last_execution_date, last_execution_date})
     :ok
   end
 
-  defp do_purge(scheduler_module) do
-    table = get_ets_by_scheduler(scheduler_module)
+  defp do_purge(storage_name, scheduler_module) do
+    table = get_ets_by_scheduler(storage_name, scheduler_module)
     :ets.delete_all_objects(table)
     :ok
-  end
-
-  @behaviour Quantum.Storage.Adapter
-
-  def jobs(scheduler_module) do
-    __server__ |> GenServer.call({:jobs, scheduler_module})
-  end
-
-  def add_job(scheduler_module, job) do
-    __server__ |> GenServer.call({:add_job, scheduler_module, job})
-  end
-
-  def delete_job(scheduler_module, job_name) do
-    __server__ |> GenServer.call({:delete_job, scheduler_module, job_name})
-  end
-
-  def update_job_state(scheduler_module, job_name, state) do
-    __server__ |> GenServer.call({:update_job_state, scheduler_module, job_name, state})
-  end
-
-  def last_execution_date(scheduler_module) do
-    __server__ |> GenServer.call({:last_execution_date, scheduler_module})
-  end
-
-  def update_last_execution_date(scheduler_module, last_execution_date) do
-    __server__
-    |> GenServer.call({:update_last_execution_date, scheduler_module, last_execution_date})
-  end
-
-  def purge(scheduler_module) do
-    __server__ |> GenServer.call({:purge, scheduler_module})
   end
 end
