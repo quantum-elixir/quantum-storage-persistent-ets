@@ -298,12 +298,12 @@ defmodule QuantumStoragePersistentEts do
   end
 
   defp do_get_last_execution_date(storage_name, scheduler_module) do
-    table = get_ets_by_scheduler(storage_name, scheduler_module)
-
-    case :ets.lookup(table, :last_execution_date) do
+    storage_name
+    |> get_ets_by_scheduler(scheduler_module)
+    |> :ets.lookup(:last_execution_date)
+    |> case do
       [] -> :unknown
       [{:last_execution_date, date} | _t] -> date
-      {:last_execution_date, d} -> d
     end
   end
 

@@ -9,7 +9,7 @@ defmodule QuantumStoragePersistentEts.MixProject do
     [
       app: :quantum_storage_persistent_ets,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.8",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
@@ -17,7 +17,19 @@ defmodule QuantumStoragePersistentEts.MixProject do
       name: "Quantum Storage Persistent ETS",
       elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
-      test_coverage: [tool: ExCoveralls]
+      test_coverage: [tool: ExCoveralls],
+      build_embedded: (System.get_env("BUILD_EMBEDDED") || "false") in ["1", "true"],
+      dialyzer:
+        [
+          ignore_warnings: "dialyzer.ignore-warnings"
+        ] ++
+          if (System.get_env("DIALYZER_PLT_PRIV") || "false") in ["1", "true"] do
+            [
+              plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+            ]
+          else
+            []
+          end
     ]
   end
 
