@@ -36,8 +36,7 @@ defmodule QuantumStoragePersistentEts.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-      mod: {QuantumStoragePersistentEts.Application, []}
+      extra_applications: [:logger]
     ]
   end
 
@@ -74,7 +73,7 @@ defmodule QuantumStoragePersistentEts.MixProject do
   defp deps do
     [
       {:persistent_ets, "~> 0.1"},
-      {:quantum, "~> 3.0-rc"},
+      {:quantum, "~> 3.0.0-rc.2"},
       {:ex_doc, "~> 0.13", only: [:dev, :docs], runtime: false},
       {:excoveralls, "~> 0.5", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0-rc", only: [:dev, :test], runtime: false},

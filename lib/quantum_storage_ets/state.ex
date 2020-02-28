@@ -1,8 +1,8 @@
 defmodule QuantumStoragePersistentEts.State do
   @moduledoc false
 
-  @type t :: %__MODULE__{schedulers: map}
+  @type t :: %__MODULE__{table: :ets.tid()}
 
-  @enforce_keys [:schedulers, :name]
-  defstruct schedulers: %{}, name: QuantumStoragePersistentEts
+  @enforce_keys [:table]
+  defstruct @enforce_keys
 end
