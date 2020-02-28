@@ -1,4 +1,4 @@
-defmodule QuantumStorageEts.MixProject do
+defmodule QuantumStoragePersistentEts.MixProject do
   @moduledoc false
 
   use Mix.Project
@@ -7,14 +7,14 @@ defmodule QuantumStorageEts.MixProject do
 
   def project do
     [
-      app: :quantum_storage_ets,
+      app: :quantum_storage_persistent_ets,
       version: @version,
       elixir: "~> 1.6",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: docs(),
-      name: "Quantum Storage ETS",
+      name: "Quantum Storage Persistent ETS",
       elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
       test_coverage: [tool: ExCoveralls]
@@ -24,7 +24,8 @@ defmodule QuantumStorageEts.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      extra_applications: [:logger],
+      mod: {QuantumStoragePersistentEts.Application, []}
     ]
   end
 
@@ -39,8 +40,8 @@ defmodule QuantumStorageEts.MixProject do
       licenses: ["Apache License 2.0"],
       links: %{
         "Changelog" =>
-          "https://github.com/quantum-elixir/quantum-storage-ets/blob/master/CHANGELOG.md",
-        "GitHub" => "https://github.com/quantum-elixir/quantum-storage-ets"
+          "https://github.com/quantum-elixir/quantum-storage-persistent-ets/blob/master/CHANGELOG.md",
+        "GitHub" => "https://github.com/quantum-elixir/quantum-storage-persistent-ets"
       }
     }
   end
@@ -49,7 +50,7 @@ defmodule QuantumStorageEts.MixProject do
     [
       main: "readme",
       source_ref: "v#{@version}",
-      source_url: "https://github.com/quantum-elixir/quantum-storage-ets",
+      source_url: "https://github.com/quantum-elixir/quantum-storage-persistent-ets",
       extras: [
         "README.md",
         "CHANGELOG.md"

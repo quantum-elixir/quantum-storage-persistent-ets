@@ -1,4 +1,4 @@
-defmodule QuantumStorageEts do
+defmodule QuantumStoragePersistentEts do
   @moduledoc """
   `PersistentEts` based implementation of a `Quantum.Storage`.
   """
@@ -13,43 +13,54 @@ defmodule QuantumStorageEts do
 
   @behaviour Quantum.Storage
 
+  @doc false
   def start_link(opts),
     do: GenServer.start_link(__MODULE__, opts, name: Keyword.get(opts, :name, @server))
 
+  @doc false
   @impl GenServer
   def init(opts), do: {:ok, %State{schedulers: %{}, name: Keyword.get(opts, :name, @server)}}
 
+  @doc false
   @impl Quantum.Storage
   def jobs(server \\ @server, scheduler_module),
     do: GenServer.call(server, {:jobs, scheduler_module})
 
+  @doc false
   @impl Quantum.Storage
   def add_job(server \\ @server, scheduler_module, job),
     do: GenServer.call(server, {:add_job, scheduler_module, job})
 
+  @doc false
   @impl Quantum.Storage
   def delete_job(server \\ @server, scheduler_module, job_name),
     do: GenServer.call(server, {:delete_job, scheduler_module, job_name})
 
+  @doc false
   @impl Quantum.Storage
   def update_job_state(server \\ @server, scheduler_module, job_name, state),
     do: GenServer.call(server, {:update_job_state, scheduler_module, job_name, state})
 
+  @doc false
   @impl Quantum.Storage
   def last_execution_date(server \\ @server, scheduler_module),
     do: GenServer.call(server, {:last_execution_date, scheduler_module})
 
+  @doc false
   @impl Quantum.Storage
   def update_last_execution_date(server \\ @server, scheduler_module, last_execution_date),
     do:
       GenServer.call(server, {:update_last_execution_date, scheduler_module, last_execution_date})
 
+  @doc false
   @impl Quantum.Storage
   def purge(server \\ @server, scheduler_module),
     do: GenServer.call(server, {:purge, scheduler_module})
 
+  @doc false
   def purge_all(server \\ @server), do: GenServer.call(server, :purge_all)
 
+  @doc false
   @impl GenServer
   def handle_call(
         {:add_job, scheduler_module, job},
@@ -203,7 +214,11 @@ defmodule QuantumStorageEts do
     if ets_exist?(scheduler_module_atom) do
       scheduler_module_atom
     else
-      path = Application.app_dir(:quantum_storage_ets, "priv/tables/#{scheduler_module_atom}.tab")
+      path =
+        Application.app_dir(
+          :quantum_storage_persistent_ets,
+          "priv/tables/#{scheduler_module_atom}.tab"
+        )
 
       File.mkdir_p!(Path.dirname(path))
 

@@ -1,30 +1,30 @@
-# Quantum Storage Ets
+# Quantum Storage Persistent Ets
 
-[![Hex.pm Version](http://img.shields.io/hexpm/v/quantum_storage_ets.svg)](https://hex.pm/packages/quantum_storage_ets)
-[![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/quantum_storage_ets)
-[![Build Status](https://travis-ci.org/quantum-elixir/quantum-storage-ets.svg?branch=master)](https://travis-ci.org/quantum-elixir/quantum-storage-ets)
-[![Coverage Status](https://coveralls.io/repos/quantum-elixir/quantum-storage-ets/badge.svg?branch=master)](https://coveralls.io/r/quantum-elixir/quantum-storage-ets?branch=master)
-[![Inline docs](http://inch-ci.org/github/quantum-elixir/quantum-storage-ets.svg)](http://inch-ci.org/github/quantum-elixir/quantum-storage-ets)
-[![Hex.pm](https://img.shields.io/hexpm/dt/quantum_storage_ets.svg)](https://hex.pm/packages/quantum_storage_ets)
+[![Hex.pm Version](http://img.shields.io/hexpm/v/quantum_storage_persistent_ets.svg)](https://hex.pm/packages/quantum_storage_persistent_ets)
+[![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/quantum_storage_persistent_ets)
+[![Build Status](https://travis-ci.org/quantum-elixir/quantum-storage-persistent-ets.svg?branch=master)](https://travis-ci.org/quantum-elixir/quantum-storage-persistent-ets)
+[![Coverage Status](https://coveralls.io/repos/quantum-elixir/quantum-storage-persistent-ets/badge.svg?branch=master)](https://coveralls.io/r/quantum-elixir/quantum-storage-persistent-ets?branch=master)
+[![Inline docs](http://inch-ci.org/github/quantum-elixir/quantum-storage-persistent-ets.svg)](http://inch-ci.org/github/quantum-elixir/quantum-storage-persistent-ets)
+[![Hex.pm](https://img.shields.io/hexpm/dt/quantum_storage_persistent_ets.svg)](https://hex.pm/packages/quantum_storage_persistent_ets)
 
 Adds a persistent storage adapter for ETS.
 
 ## Installation
 
-The package can be installed by adding `quantum_storage_ets` to your list
+The package can be installed by adding `quantum_storage_persistent_ets` to your list
 of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:quantum_storage_ets, "~> 0.1.0"}
+    {:quantum_storage_persistent_ets, "~> 0.1.0"}
   ]
 end
 ```
 
 Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
 and published on [HexDocs](https://hexdocs.pm). The docs can be found at
-[https://hexdocs.pm/quantum_storage_ets](https://hexdocs.pm/quantum_storage_ets).
+[https://hexdocs.pm/quantum_storage_persistent_ets](https://hexdocs.pm/quantum_storage_persistent_ets).
 
 ## Contribution
 
@@ -36,14 +36,14 @@ terms of this contract."
 
 ### tl;dr
 
-1. Check for [open issues](https://github.com/quantum-elixir/quantum-storage-ets/issues) or [open a new issue](https://github.com/quantum-elixir/quantum-storage-ets/issues/new) to start
+1. Check for [open issues](https://github.com/quantum-elixir/quantum-storage-persistent-ets/issues) or [open a new issue](https://github.com/quantum-elixir/quantum-storage-persistent-ets/issues/new) to start
 a discussion around [a problem](https://www.youtube.com/watch?v=_QF9sFJGJuc).
 2. Issues SHALL be named as "Problem: _description of the problem_".
-3. Fork the [quantum-storage-ets repository on GitHub](https://github.com/quantum-elixir/quantum-storage-ets) to start making your changes
+3. Fork the [quantum-storage-persistent-ets repository on GitHub](https://github.com/quantum-elixir/quantum-storage-persistent-ets) to start making your changes
 4. If possible, write a test which shows that the problem was solved.
 5. Send a pull request.
 6. Pull requests SHALL be named as "Solution: _description of your solution_"
-7. Your pull request is merged and you are added to the [list of contributors](https://github.com/quantum-elixir/quantum-storage-ets/graphs/contributors)
+7. Your pull request is merged and you are added to the [list of contributors](https://github.com/quantum-elixir/quantum-storage-persistent-ets/graphs/contributors)
 
 ## License
 
