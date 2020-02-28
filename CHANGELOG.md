@@ -4,10 +4,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+Diff for [unreleased](https://github.com/quantum-elixir/quantum-storage-persistent-ets/compare/v1.0.0-rc.1...HEAD)
+
+## v1.0.0-rc.1
+
 ### Added
 
  * Initial Commit
 
-Diff for [unreleased]
-
-[unreleased]: https://github.com/c-rack/quantum-elixir/compare/v0.0.1...HEAD
+Files for [v1.0.0-rc.1](https://github.com/quantum-elixir/quantum-storage-persistent-ets/tree/v1.0.0-rc.1)

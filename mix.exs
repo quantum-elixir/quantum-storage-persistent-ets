@@ -3,7 +3,7 @@ defmodule QuantumStoragePersistentEts.MixProject do
 
   use Mix.Project
 
-  @version "0.0.1"
+  @version "1.0.0-rc.1"
 
   def project do
     [
@@ -15,6 +15,7 @@ defmodule QuantumStoragePersistentEts.MixProject do
       deps: deps(),
       docs: docs(),
       name: "Quantum Storage Persistent ETS",
+      description: "Quantum Storage Adapter based on Persistent ETS",
       elixirc_paths: elixirc_paths(Mix.env()),
       package: package(),
       test_coverage: [tool: ExCoveralls],
@@ -49,6 +50,7 @@ defmodule QuantumStoragePersistentEts.MixProject do
         "Jonatan Männchen"
       ],
       licenses: ["Apache License 2.0"],
+      exclude_patterns: [~r[priv/(tables|plts)]],
       links: %{
         "Changelog" =>
           "https://github.com/quantum-elixir/quantum-storage-persistent-ets/blob/master/CHANGELOG.md",
