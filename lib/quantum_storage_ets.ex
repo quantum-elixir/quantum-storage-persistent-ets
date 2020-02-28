@@ -47,16 +47,16 @@ defmodule QuantumStoragePersistentEts do
 
   @doc false
   @impl Quantum.Storage
-  def add_job(storage_pid, job), do: GenServer.call(storage_pid, {:add_job, job})
+  def add_job(storage_pid, job), do: GenServer.cast(storage_pid, {:add_job, job})
 
   @doc false
   @impl Quantum.Storage
-  def delete_job(storage_pid, job_name), do: GenServer.call(storage_pid, {:delete_job, job_name})
+  def delete_job(storage_pid, job_name), do: GenServer.cast(storage_pid, {:delete_job, job_name})
 
   @doc false
   @impl Quantum.Storage
   def update_job_state(storage_pid, job_name, state),
-    do: GenServer.call(storage_pid, {:update_job_state, job_name, state})
+    do: GenServer.cast(storage_pid, {:update_job_state, job_name, state})
 
   @doc false
   @impl Quantum.Storage
@@ -65,51 +65,15 @@ defmodule QuantumStoragePersistentEts do
   @doc false
   @impl Quantum.Storage
   def update_last_execution_date(storage_pid, last_execution_date),
-    do: GenServer.call(storage_pid, {:update_last_execution_date, last_execution_date})
+    do: GenServer.cast(storage_pid, {:update_last_execution_date, last_execution_date})
 
   @doc false
   @impl Quantum.Storage
-  def purge(storage_pid), do: GenServer.call(storage_pid, :purge)
+  def purge(storage_pid), do: GenServer.cast(storage_pid, :purge)
 
   @doc false
   @impl GenServer
-  def handle_call({:add_job, job}, _from, %State{table: table} = state) do
-    {:reply, do_add_job(table, job), state}
-  end
-
-  def handle_call(:jobs, _from, %State{table: table} = state) do
-    {:reply, do_get_jobs(table), state}
-  end
-
-  def handle_call({:delete_job, job}, _from, %State{table: table} = state) do
-    {:reply, do_delete_job(table, job), state}
-  end
-
-  def handle_call({:update_job_state, job_name, job_state}, _from, %State{table: table} = state) do
-    {:reply, do_update_job_state(table, job_name, job_state), state}
-  end
-
-  def handle_call(:last_execution_date, _from, %State{table: table} = state) do
-    {:reply, do_get_last_execution_date(table), state}
-  end
-
-  def handle_call(
-        {:update_last_execution_date, last_execution_date},
-        _from,
-        %State{table: table} = state
-      ) do
-    {:reply, do_update_last_execution_date(table, last_execution_date), state}
-  end
-
-  def handle_call(:purge, _from, %State{table: table} = state) do
-    {:reply, do_purge(table), state}
-  end
-
-  defp job_key(job_name) do
-    {:job, job_name}
-  end
-
-  defp do_add_job(table, job) do
+  def handle_cast({:add_job, job}, %State{table: table} = state) do
     :ets.insert(table, entry = {job_key(job.name), job})
     :ets.insert(table, {:init_jobs})
 
@@ -119,54 +83,67 @@ defmodule QuantumStoragePersistentEts do
       }]"
     end)
 
-    :ok
+    {:noreply, state}
   end
 
-  defp do_get_jobs(table) do
-    table
-    |> :ets.lookup(:init_jobs)
-    |> case do
-      [{:init_jobs}] ->
-        table
-        |> :ets.match({{:job, :_}, :"$1"})
-        |> List.flatten()
-
-      [] ->
-        :not_applicable
-    end
-  end
-
-  defp do_delete_job(table, job_name) do
+  def handle_cast({:delete_job, job_name}, %State{table: table} = state) do
     :ets.delete(table, job_key(job_name))
 
-    :ok
+    {:noreply, state}
   end
 
-  defp do_update_job_state(table, job_name, state) do
+  def handle_cast({:update_job_state, job_name, job_state}, %State{table: table} = state) do
     table
     |> :ets.lookup(job_key(job_name))
-    |> Enum.map(&{elem(&1, 0), %{elem(&1, 1) | state: state}})
+    |> Enum.map(&{elem(&1, 0), %{elem(&1, 1) | state: job_state}})
     |> Enum.each(&:ets.update_element(table, elem(&1, 0), {2, elem(&1, 1)}))
 
-    :ok
+    {:noreply, state}
   end
 
-  defp do_get_last_execution_date(table) do
-    table
-    |> :ets.lookup(:last_execution_date)
-    |> case do
-      [] -> :unknown
-      [{:last_execution_date, date} | _t] -> date
-    end
-  end
-
-  defp do_update_last_execution_date(table, last_execution_date) do
+  def handle_cast(
+        {:update_last_execution_date, last_execution_date},
+        %State{table: table} = state
+      ) do
     :ets.insert(table, {:last_execution_date, last_execution_date})
-    :ok
+
+    {:noreply, state}
   end
 
-  defp do_purge(table) do
+  def handle_cast(:purge, %State{table: table} = state) do
     :ets.delete_all_objects(table)
-    :ok
+
+    {:noreply, state}
+  end
+
+  @doc false
+  @impl GenServer
+  def handle_call(:jobs, _from, %State{table: table} = state) do
+    {:reply,
+     table
+     |> :ets.lookup(:init_jobs)
+     |> case do
+       [{:init_jobs}] ->
+         table
+         |> :ets.match({{:job, :_}, :"$1"})
+         |> List.flatten()
+
+       [] ->
+         :not_applicable
+     end, state}
+  end
+
+  def handle_call(:last_execution_date, _from, %State{table: table} = state) do
+    {:reply,
+     table
+     |> :ets.lookup(:last_execution_date)
+     |> case do
+       [] -> :unknown
+       [{:last_execution_date, date} | _t] -> date
+     end, state}
+  end
+
+  defp job_key(job_name) do
+    {:job, job_name}
   end
 end
