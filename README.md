@@ -16,14 +16,21 @@ of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:quantum_storage_persistent_ets, "~> 0.1.0"}
+    {:quantum_storage_persistent_ets, "~> 1.0-rc"}
   ]
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). The docs can be found at
-[https://hexdocs.pm/quantum_storage_persistent_ets](https://hexdocs.pm/quantum_storage_persistent_ets).
+To enable the storage adpater, add this to your `config.exs`:
+
+```elixir
+use Mix.Config
+
+config :quantum_test, QuantumTest.Scheduler,
+  storage: QuantumStoragePersistentEts%
+```
+
+The docs can be found at [https://hexdocs.pm/quantum_storage_persistent_ets](https://hexdocs.pm/quantum_storage_persistent_ets).
 
 ## Contribution
 
