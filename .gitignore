@@ -26,4 +26,8 @@ quantum_storage_persistent_ets-*.tar
 /mix.lock
 
 # Ets Tables
-/priv/tables/*.tab
+/priv/tables/**/*.tab
+
+# Dialyzer
+/priv/plts/*.plt
+/priv/plts/*.hash

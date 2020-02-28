@@ -7,6 +7,6 @@ defmodule QuantumStoragePersistentEts.Application do
     do:
       Supervisor.start_link([QuantumStoragePersistentEts],
         strategy: :one_for_one,
-        name: QuantumTest.Supervisor
+        name: QuantumStoragePersistentEts.Supervisor
       )
 end

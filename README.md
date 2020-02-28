@@ -2,9 +2,8 @@
 
 [![Hex.pm Version](http://img.shields.io/hexpm/v/quantum_storage_persistent_ets.svg)](https://hex.pm/packages/quantum_storage_persistent_ets)
 [![Hex docs](http://img.shields.io/badge/hex.pm-docs-green.svg?style=flat)](https://hexdocs.pm/quantum_storage_persistent_ets)
-[![Build Status](https://travis-ci.org/quantum-elixir/quantum-storage-persistent-ets.svg?branch=master)](https://travis-ci.org/quantum-elixir/quantum-storage-persistent-ets)
+![.github/workflows/elixir.yml](https://github.com/quantum-elixir/quantum-storage-persistent-ets/workflows/.github/workflows/elixir.yml/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/quantum-elixir/quantum-storage-persistent-ets/badge.svg?branch=master)](https://coveralls.io/r/quantum-elixir/quantum-storage-persistent-ets?branch=master)
-[![Inline docs](http://inch-ci.org/github/quantum-elixir/quantum-storage-persistent-ets.svg)](http://inch-ci.org/github/quantum-elixir/quantum-storage-persistent-ets)
 [![Hex.pm](https://img.shields.io/hexpm/dt/quantum_storage_persistent_ets.svg)](https://hex.pm/packages/quantum_storage_persistent_ets)
 
 Adds a persistent storage adapter for ETS.
