@@ -24,3 +24,6 @@ quantum_storage_ets-*.tar
 
 # Ignore mix.lock
 /mix.lock
+
+# Ets Tables
+/priv/tables/*.tab
