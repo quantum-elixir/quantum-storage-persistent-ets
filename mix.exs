@@ -74,12 +74,12 @@ defmodule QuantumStoragePersistentEts.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:persistent_ets, "~> 0.1"},
-      {:quantum, "~> 3.0.0-rc.2"},
+      {:persistent_ets, "~> 0.2"},
+      {:quantum, "~> 3.0"},
       {:ex_doc, "~> 0.13", only: [:dev, :docs], runtime: false},
-      {:excoveralls, "~> 0.5", only: [:dev, :test], runtime: false},
-      {:dialyxir, "~> 1.0-rc", only: [:dev, :test], runtime: false},
-      {:credo, "~> 1.0", only: [:dev, :test], runtime: false}
+      {:excoveralls, "~> 0.13", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 end
