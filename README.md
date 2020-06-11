@@ -27,7 +27,7 @@ To enable the storage adpater, add this to your `config.exs`:
 use Mix.Config
 
 config :quantum_test, QuantumTest.Scheduler,
-  storage: QuantumStoragePersistentEts%
+  storage: QuantumStoragePersistentEts
 ```
 
 The docs can be found at [https://hexdocs.pm/quantum_storage_persistent_ets](https://hexdocs.pm/quantum_storage_persistent_ets).
