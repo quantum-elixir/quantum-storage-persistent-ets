@@ -16,7 +16,7 @@ of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
-    {:quantum_storage_persistent_ets, "~> 1.0-rc"}
+    {:quantum_storage_persistent_ets, "~> 1.0"}
   ]
 end
 ```
